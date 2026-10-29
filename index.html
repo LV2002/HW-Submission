@@ -39,6 +39,7 @@ ul{list-style:none;margin:0;padding:0}
  <div id="home">
   <h1>DRH Homework Tracker</h1>
   <div class="muted" id="sub"></div>
+  <div class="muted" id="status" style="font-size:13px"></div>
   <div class="avg"><span>Class average</span><b id="avg"></b></div>
   <input id="q" type="search" placeholder="Search your name" aria-label="Search your name" autocomplete="off">
   <div class="row">
@@ -97,8 +98,19 @@ $('list').addEventListener('click',e=>{const b=e.target.closest('.st');if(b){loc
 ['q','batch','sort'].forEach(i=>$(i).addEventListener('input',renderList));
 window.addEventListener('hashchange',route);
 load(SAVED);
-if (SCRIPT_URL) fetch(SCRIPT_URL + (SCRIPT_URL.includes('?') ? '&' : '?') + 'data=1')
-  .then(r => r.json()).then(d => { if (d && d.students) load(d); }).catch(() => {});
+const setStatus = t => { $('status').textContent = t; };
+if (SCRIPT_URL) {
+  setStatus('Checking the sheet for the latest data…');
+  fetch(SCRIPT_URL + (SCRIPT_URL.includes('?') ? '&' : '?') + 'data=1', { cache: 'no-store' })
+    .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.text(); })
+    .then(t => {
+      let d; try { d = JSON.parse(t); } catch (e) { throw new Error('the link did not return data'); }
+      if (!d || !d.students) throw new Error(d && d.error ? d.error : 'no student data');
+      load(d);
+      setStatus('Live from the sheet · checked ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
+    })
+    .catch(e => setStatus('Showing the last saved data (could not reach the sheet: ' + e.message + ').'));
+} else setStatus('Showing saved data.');
 </script>
 
 </body></html>
