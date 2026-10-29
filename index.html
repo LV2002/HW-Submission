@@ -1,3 +1,5 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>DRH Homework Tracker</title></head><body style="margin:0">
 <style>
 :root{--bg:#fff;--ink:#1a1a1a;--muted:#666;--line:#e3e3e3;--soft:#f5f5f5;--good:#1a7f45;--bad:#c0392b;--accent:#1f4fd8}
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#121212;--ink:#eee;--muted:#999;--line:#2c2c2c;--soft:#1c1c1c;--good:#4cc27f;--bad:#ff7a6b;--accent:#8aa4ff;color-scheme:dark}}
@@ -37,7 +39,6 @@ ul{list-style:none;margin:0;padding:0}
  <div id="home">
   <h1>DRH Homework Tracker</h1>
   <div class="muted" id="sub"></div>
-  <p class="muted" id="loading">Loading…</p>
   <div class="avg"><span>Class average</span><b id="avg"></b></div>
   <input id="q" type="search" placeholder="Search your name" aria-label="Search your name" autocomplete="off">
   <div class="row">
@@ -49,18 +50,22 @@ ul{list-style:none;margin:0;padding:0}
  <div id="detail" hidden></div>
 </div>
 <script>
-function fail(e){document.getElementById('loading').textContent='Could not load the data. Please refresh in a minute.';}
-google.script.run.withSuccessHandler(start).withFailureHandler(fail).getData();
-function start(DATA){
-document.getElementById('loading').hidden=true;
+/* Optional live data: paste your Apps Script web app URL (ending in /exec) between the quotes.
+   Leave it empty to show the saved data below. */
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyKUa6gbCzBkbP69qezmB4mLtiIvEMmZyuE1GyYG22d1cJO3CwjCbH_VE9wPhzw0K1uVw/exec';
+const SAVED = {"hws":[{"n":"DS 14A","d":"","c":false},{"n":"BM 6B","d":"28 Oct","c":false},{"n":"BM 6A","d":"28 Oct","c":false},{"n":"GK 11 A","d":"27 Oct","c":true},{"n":"DS 11A","d":"27 Oct","c":true},{"n":"EG 23A","d":"26 Oct","c":true},{"n":"AA 7A","d":"26 Oct","c":true},{"n":"AA 6A","d":"26 Oct","c":true},{"n":"AA 5A","d":"26 Oct","c":true},{"n":"VC-10A","d":"23 Oct","c":true},{"n":"GK-10A","d":"22 Oct","c":true},{"n":"BM 4B","d":"22 Oct","c":true},{"n":"BM 4A","d":"22 Oct","c":true},{"n":"BM3A","d":"22 Oct","c":true},{"n":"NAVARATHRI HW","d":"21 Oct","c":true},{"n":"DS 10 A","d":"21 Oct","c":true},{"n":"EG 22A","d":"21 Oct","c":true},{"n":"EG 19A","d":"19 Oct","c":true},{"n":"VR2A","d":"19 Oct","c":true},{"n":"VR1A","d":"19 Oct","c":true},{"n":"AA 4A","d":"16 Oct","c":true},{"n":"DS 9A","d":"15 Oct","c":true},{"n":"GK 9A","d":"15 Oct","c":true},{"n":"GK 8A","d":"15 Oct","c":true},{"n":"EG 17A","d":"14 Oct","c":true},{"n":"DS 8A","d":"14 Oct","c":true},{"n":"VC 9A","d":"13 Oct","c":true},{"n":"AA 3A","d":"13 Oct","c":true},{"n":"BM 2B","d":"12 Oct","c":true},{"n":"DS 7A","d":"12 Oct","c":true},{"n":"AA 2A","d":"9 Oct","c":true},{"n":"VC 8A","d":"8 Oct","c":true},{"n":"VC 7B","d":"7 Oct","c":true},{"n":"EG 16A","d":"7 Oct","c":true},{"n":"EG 18A","d":"7 Oct","c":true},{"n":"GK 8A","d":"6 Oct","c":true},{"n":"DS 6A","d":"6 Oct","c":true},{"n":"GK11A","d":"6 Oct","c":true},{"n":"GK 7A","d":"5 Oct","c":true},{"n":"VC 6A","d":"1 Oct","c":true}],"students":[{"n":"Aadhil Selvaraj","b":"DRH-1","s":"0000000000000010000000000000000100010010"},{"n":"Aashin Binoy","b":"DRH-1","s":"0001100000111101111111111111011111111111"},{"n":"Abhi S M","b":"DRH-1","s":"0000000000110100111011111101111011010010"},{"n":"Abhiram Sreejith","b":"DRH-1","s":"0111100000011100110001101010110101000100"},{"n":"Abhiram V","b":"DRH-1","s":"0001110000100000100000111000000001010100"},{"n":"Achyut Hari","b":"DRH-1","s":"0000000000000000000000000000000000000000"},{"n":"Akhil Prasad","b":"DRH-1","s":"0000000001000001000001010100000100010010"},{"n":"Ameen Ahmed Nazir","b":"DRH-1","s":"0000000000111101010011111101111111111101"},{"n":"Amrita V","b":"DRH-1","s":"0001000100111100110011110001111101111111"},{"n":"AnandaPadmanabhan S","b":"DRH-1","s":"0001110001111111111101111110110111010111"},{"n":"Angel Maria Liju","b":"DRH-1","s":"0001000001011101101111011101111111010101"},{"n":"Anisha Benny","b":"DRH-2","s":"0000000000000100000000110000000011010000"},{"n":"Ann Jin C","b":"DRH-1","s":"0001000001110100110011111101101111011111"},{"n":"Ansa Maria George","b":"DRH-1","s":"0000100101100100000011110101101111011010"},{"n":"Anugraha Chandran","b":"DRH-1","s":"0000000001000010110001011000010011111011"},{"n":"Ardra Jinesh","b":"DRH-1","s":"0001100000111100110111111001111011111111"},{"n":"Arjun K Baiju","b":"DRH-2","s":"0001110111111111110011111101111101011111"},{"n":"Aswani Sajeev","b":"DRH-1","s":"0000000000100111000000000100110111001010"},{"n":"Athira Naveen","b":"DRH-1","s":"0000000000000000000000000000000010000010"},{"n":"Avani Harish","b":"DRH-2","s":"0000100000000100000000000001110000001011"},{"n":"Avinash Jayan","b":"DRH-2","s":"0001110000111100110010111001101001010110"},{"n":"Deva Nandan P B","b":"DRH-1","s":"0000000001000000000001100100010110001011"},{"n":"Devi Savithri","b":"DRH-2","s":"0000101111111100000010110001100110011001"},{"n":"Dhyan P A","b":"DRH-1","s":"0000000000111101111111111101111111011011"},{"n":"Diyona Roy","b":"DRH-2","s":"0001100001100001001101111100011011011111"},{"n":"Emi Maria Tom","b":"DRH-1","s":"0010000001111100111110101001111011000011"},{"n":"Esa Jacob","b":"DRH-2","s":"0000010111100110110111110101110101111011"},{"n":"Farhan Altaf","b":"DRH-1","s":"0001100000111100111110111011111111010111"},{"n":"Fiya Kabeer","b":"DRH-1","s":"0001110001100100110011111001111111010111"},{"n":"Govind PB","b":"DRH-2","s":"0001100000110100110111111101101111111111"},{"n":"Jazil hashim","b":"DRH-2","s":"0000000000110100000000110001100000011010"},{"n":"Keerthi S","b":"DRH-1","s":"0000000000011100111010010001101111111011"},{"n":"Krishna Priya T M","b":"DRH-1","s":"0001110010100111110001011110110111111111"},{"n":"Lekshminandhana Pramod","b":"DRH-1","s":"0001011110111110110010111001111111010110"},{"n":"Lithin Jose","b":"DRH-1","s":"0000000001111101001111111101111111111011"},{"n":"Malavika S Kakkady","b":"DRH-1","s":"0001010010100111110011111111111011110111"},{"n":"Meenakshi Sasi","b":"DRH-1","s":"0001010000000000110010011001001111110110"},{"n":"Mercy Jojan","b":"DRH-2","s":"0000100001110110110011111001111111011010"},{"n":"Muhammed Ameen Riyas","b":"DRH-1","s":"0001111101101110110001110011111111010111"},{"n":"Nivedhya P B","b":"DRH-1","s":"0000000001000000000001010100000110011011"},{"n":"Nivedya J","b":"DRH-2","s":"0001111111111110111111111111111111111111"},{"n":"Nivedya S Raj","b":"DRH-2","s":"0000000001011110000101100100110101001000"},{"n":"Praghanya","b":"DRH-2","s":"0001110010100100110011111111111101111111"},{"n":"Praneeth s","b":"DRH-2","s":"0001011110101111111101111111110101011111"},{"n":"Remya Joshy","b":"DRH-2","s":"0000000000100000001100110000000000011010"},{"n":"Rishikesh R","b":"DRH-1","s":"0001110000100011111111111101001111011111"},{"n":"Savio Santhosh","b":"DRH-2","s":"0000000000100100001000010000100001111010"},{"n":"Shereen Liaz","b":"DRH-1","s":"0000000000100001110011111101011111011011"},{"n":"Shivani V Nath","b":"DRH-2","s":"1001000000110100000010110001111000010110"},{"n":"Shivanith Vimal","b":"DRH-2","s":"1001100011100110110001111000100111011011"},{"n":"Sia Sylvester","b":"DRH-1","s":"0000000001000110110000011000110101010011"},{"n":"Sidhardh S","b":"DRH-1","s":"0000000000000001000001000100000010001001"},{"n":"Sidhya Balaji","b":"DRH-2","s":"0001111111111101111110111000110101111111"},{"n":"Sooraj Kiran S","b":"DRH-2","s":"0000000000000100000000100000100000001000"},{"n":"Sreelakshmi S","b":"DRH-1","s":"0001000000110101110010111101111011010110"},{"n":"Sreethu M","b":"DRH-2","s":"0001111111011100110111011111111111110111"},{"n":"Surya Suresh","b":"DRH-2","s":"0000000000110100000010100011101100000010"},{"n":"Swetalekshmy Sukumaran","b":"DRH-1","s":"0001100001100001110010111101001111010111"},{"n":"Tanay KaiPully","b":"DRH-2","s":"0001110001011110111111111111111011110111"},{"n":"Venkitesh M","b":"DRH-2","s":"0000100000000101000000010000100000011010"},{"n":"Vinayak K G","b":"DRH-2","s":"0000000000101100000010110001101001110010"},{"n":"Vismaya Shisi","b":"DRH-1","s":"0000110001100110111101110010111111111011"},{"n":"Vrinda Biju","b":"DRH-1","s":"0001010001111101110011011001111111011111"},{"n":"Yashaswini Awasthi","b":"DRH-1","s":"0000100010100110101100110110110111111111"}]};
 const $ = id => document.getElementById(id);
-const hws = DATA.hws, students = DATA.students;
-const counted = hws.map((h,i)=>h.c?i:-1).filter(i=>i>=0), total = counted.length;
-students.forEach((s,i)=>{s.id=i;s.done=counted.filter(k=>s.s[k]==='1').length;s.pct=Math.round(s.done/total*100)});
-const avg = Math.round(students.reduce((a,s)=>a+s.done,0)/(students.length*total)*100);
+let hws=[],students=[],counted=[],total=0,avg=0;
+function load(DATA){
+  hws=DATA.hws;students=DATA.students;
+  counted=hws.map((h,i)=>h.c?i:-1).filter(i=>i>=0);total=counted.length;
+  students.forEach((s,i)=>{s.id=i;s.done=counted.filter(k=>s.s[k]==='1').length;s.pct=Math.round(s.done/total*100)});
+  avg=Math.round(students.reduce((a,s)=>a+s.done,0)/(students.length*total)*100);
+  $('sub').textContent=(DATA.month?DATA.month+': ':'')+total+' homeworks, up to '+hws.find(h=>h.c).d+'.';
+  $('avg').textContent=avg+'%';
+  route();
+}
 const esc = t=>String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-$('sub').textContent = (DATA.month?DATA.month+': ':'')+total+' homeworks, up to '+hws.find(h=>h.c).d+'.';
-$('avg').textContent = avg+'%';
 function renderList(){
   const q=$('q').value.trim().toLowerCase(), b=$('batch').value, so=$('sort').value;
   const r=students.filter(s=>(!b||s.b===b)&&s.n.toLowerCase().includes(q));
@@ -90,6 +95,10 @@ function route(){
 }
 $('list').addEventListener('click',e=>{const b=e.target.closest('.st');if(b){location.hash='student-'+b.dataset.id;route()}});
 ['q','batch','sort'].forEach(i=>$(i).addEventListener('input',renderList));
-window.addEventListener('hashchange',route);route();
-}
+window.addEventListener('hashchange',route);
+load(SAVED);
+if (SCRIPT_URL) fetch(SCRIPT_URL + (SCRIPT_URL.includes('?') ? '&' : '?') + 'data=1')
+  .then(r => r.json()).then(d => { if (d && d.students) load(d); }).catch(() => {});
 </script>
+
+</body></html>
