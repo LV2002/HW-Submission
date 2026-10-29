@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"></head><body style="margin:0">
+<title>DRH Homework Tracker</title>
+<style>
+:root{--bg:#fff;--ink:#1a1a1a;--muted:#666;--line:#e3e3e3;--soft:#f5f5f5;--good:#1a7f45;--bad:#c0392b;--accent:#1f4fd8}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#121212;--ink:#eee;--muted:#999;--line:#2c2c2c;--soft:#1c1c1c;--good:#4cc27f;--bad:#ff7a6b;--accent:#8aa4ff;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#121212;--ink:#eee;--muted:#999;--line:#2c2c2c;--soft:#1c1c1c;--good:#4cc27f;--bad:#ff7a6b;--accent:#8aa4ff;color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font:16px/1.4 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+ padding-block:20px 40px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.wrap{max-width:560px;margin:0 auto}
+h1{font-size:22px;margin:0 0 4px}
+h2{font-size:20px;margin:0}
+.muted{color:var(--muted);font-size:14px}
+button,input,select{font:inherit;color:inherit}
+input,select{border:1px solid var(--line);background:var(--bg);border-radius:6px;padding:9px 10px}
+input{width:100%;margin:14px 0 8px}
+.avg{background:var(--soft);border-radius:6px;padding:10px 12px;margin-top:14px;display:flex;justify-content:space-between}
+.row{display:flex;gap:8px;margin-bottom:10px}
+.row select{flex:1;min-width:0}
+ul{list-style:none;margin:0;padding:0}
+.st{display:flex;justify-content:space-between;gap:12px;width:100%;text-align:left;background:none;border:0;border-bottom:1px solid var(--line);padding:12px 2px;cursor:pointer}
+.st:hover{background:var(--soft)}
+.st b{font-weight:600;overflow-wrap:anywhere}
+.st span.p{white-space:nowrap;font-variant-numeric:tabular-nums}
+.back{background:none;border:0;color:var(--accent);padding:4px 0;margin-bottom:12px;cursor:pointer}
+.sum{display:flex;gap:10px;margin:14px 0}
+.sum div{flex:1;background:var(--soft);border-radius:6px;padding:10px;text-align:center}
+.sum b{display:block;font-size:22px;font-variant-numeric:tabular-nums}
+.tabs{display:flex;gap:6px;margin-bottom:8px}
+.tab{flex:1;padding:8px 4px;border:1px solid var(--line);border-radius:6px;background:none;cursor:pointer;font-size:14px}
+.tab[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.hw{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:10px 2px;border-bottom:1px solid var(--line)}
+.hw .d{color:var(--muted);font-size:13px}
+.tag{font-size:13px;font-weight:600;white-space:nowrap}
+.tag.y{color:var(--good)} .tag.n{color:var(--bad)} .tag.w{color:var(--muted)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+</style>
+<div class="wrap">
+ <div id="home">
+  <h1>DRH Homework Tracker</h1>
+  <div class="muted" id="sub"></div>
+  <div class="avg"><span>Class average</span><b id="avg"></b></div>
+  <input id="q" type="search" placeholder="Search your name" aria-label="Search your name" autocomplete="off">
+  <div class="row">
+   <select id="batch" aria-label="Batch"><option value="">All batches</option><option>DRH-1</option><option>DRH-2</option></select>
+   <select id="sort" aria-label="Sort"><option value="name">Name A–Z</option><option value="high">Highest %</option><option value="low">Lowest %</option></select>
+  </div>
+  <ul id="list"></ul>
+ </div>
+ <div id="detail" hidden></div>
+</div>
+<script>
+const DATA = {"hws":[{"n":"BM 6B","d":"28 Oct","c":false},{"n":"BM 6A","d":"28 Oct","c":false},{"n":"GK 11 A","d":"27 Oct","c":true},{"n":"DS 11A","d":"27 Oct","c":true},{"n":"EG 23A","d":"26 Oct","c":true},{"n":"AA 7A","d":"26 Oct","c":true},{"n":"AA 6A","d":"26 Oct","c":true},{"n":"AA 5A","d":"26 Oct","c":true},{"n":"VC-10A","d":"23 Oct","c":true},{"n":"GK-10A","d":"22 Oct","c":true},{"n":"BM 4B","d":"22 Oct","c":true},{"n":"BM 4A","d":"22 Oct","c":true},{"n":"BM3A","d":"22 Oct","c":true},{"n":"NAVARATHRI HW","d":"21 Oct","c":true},{"n":"DS 10 A","d":"21 Oct","c":true},{"n":"EG 22A","d":"21 Oct","c":true},{"n":"EG 19A","d":"19 Oct","c":true},{"n":"VR2A","d":"19 Oct","c":true},{"n":"VR1A","d":"19 Oct","c":true},{"n":"AA 4A","d":"16 Oct","c":true},{"n":"DS 9A","d":"15 Oct","c":true},{"n":"GK 9A","d":"15 Oct","c":true},{"n":"GK 8A","d":"15 Oct","c":true},{"n":"EG 17A","d":"14 Oct","c":true},{"n":"DS 8A","d":"14 Oct","c":true},{"n":"VC 9A","d":"13 Oct","c":true},{"n":"AA 3A","d":"13 Oct","c":true},{"n":"BM 2B","d":"12 Oct","c":true},{"n":"DS 7A","d":"12 Oct","c":true},{"n":"AA 2A","d":"9 Oct","c":true},{"n":"VC 8A","d":"8 Oct","c":true},{"n":"VC 7B","d":"7 Oct","c":true},{"n":"EG 16A","d":"7 Oct","c":true},{"n":"EG 18A","d":"7 Oct","c":true},{"n":"GK 8A","d":"6 Oct","c":true},{"n":"DS 6A","d":"6 Oct","c":true},{"n":"GK11A","d":"6 Oct","c":true},{"n":"GK 7A","d":"5 Oct","c":true},{"n":"VC 6A","d":"1 Oct","c":true}],"students":[{"n":"Aadhil Selvaraj","b":"DRH-1","s":"000000000000010000000000000000100010010"},{"n":"Aashin Binoy","b":"DRH-1","s":"001100000111101111111111111011111111111"},{"n":"Abhi S M","b":"DRH-1","s":"000000000110100111010111001101011010010"},{"n":"Abhiram Sreejith","b":"DRH-1","s":"111100000011100110000101010110101000100"},{"n":"Abhiram V","b":"DRH-1","s":"001010000100000100000111000000001010100"},{"n":"Achyut Hari","b":"DRH-1","s":"000000000000000000000000000000000000000"},{"n":"Akhil Prasad","b":"DRH-1","s":"000000000000000000000010000000000010010"},{"n":"Ameen Ahmed Nazir","b":"DRH-1","s":"000000000111100010010111001101111111100"},{"n":"Amrita V","b":"DRH-1","s":"001000100111100110010110001101101110110"},{"n":"AnandaPadmanabhan S","b":"DRH-1","s":"001110001111111111101111110110111010111"},{"n":"Angel Maria Liju","b":"DRH-1","s":"001000001011101101111011101111111010101"},{"n":"Anisha Benny","b":"DRH-2","s":"000000000000100000000110000000011010000"},{"n":"Ann Jin C","b":"DRH-1","s":"001000000110100110010111001101011010110"},{"n":"Ansa Maria George","b":"DRH-1","s":"000100100100100000010110001101111011010"},{"n":"Anugraha Chandran","b":"DRH-1","s":"000000001000010110001011000010011111011"},{"n":"Ardra Jinesh","b":"DRH-1","s":"001100000111100110111111001111011111111"},{"n":"Arjun K Baiju","b":"DRH-2","s":"001110110111110110011111101111101011111"},{"n":"Aswani Sajeev","b":"DRH-1","s":"000000000100111000000000100110111001010"},{"n":"Athira Naveen","b":"DRH-1","s":"000000000000000000000000000000010000010"},{"n":"Avani Harish","b":"DRH-2","s":"000000000000100000000000001110000001011"},{"n":"Avinash Jayan","b":"DRH-2","s":"001010000111100110010111001101001010110"},{"n":"Deva Nandan P B","b":"DRH-1","s":"000000000000000000000100000000000000010"},{"n":"Devi Savithri","b":"DRH-2","s":"000001111111100000010110001100110011001"},{"n":"Dhyan P A","b":"DRH-1","s":"000000000111101111110111001101011010010"},{"n":"Diyona Roy","b":"DRH-2","s":"001000001100000001100111000011011011111"},{"n":"Emi Maria Tom","b":"DRH-1","s":"010000000111100111110101001111011000011"},{"n":"Esa Jacob","b":"DRH-2","s":"000010111100110110111110101110101111011"},{"n":"Farhan Altaf","b":"DRH-1","s":"001100000111100111110111011111111010111"},{"n":"Fiya Kabeer","b":"DRH-1","s":"001110000100100110010111001111001010110"},{"n":"Govind PB","b":"DRH-2","s":"001100000110100110111111101101111111111"},{"n":"Jazil hashim","b":"DRH-2","s":"000000000110100000000110001100000011010"},{"n":"Keerthi S","b":"DRH-1","s":"000000000011100111010010001101111111011"},{"n":"Krishna Priya T M","b":"DRH-1","s":"001110010100111110001011110110111111111"},{"n":"Lekshminandhana Pramod","b":"DRH-1","s":"001001110111110110010111001111111010110"},{"n":"Lithin Jose","b":"DRH-1","s":"000000001111101001111111101111111111011"},{"n":"Malavika S Kakkady","b":"DRH-1","s":"001010010100111110011111111111011110111"},{"n":"Meenakshi Sasi","b":"DRH-1","s":"001010000000000110010011001001111110110"},{"n":"Mercy Jojan","b":"DRH-2","s":"000100001110110110011111001111111011010"},{"n":"Muhammed Ameen Riyas","b":"DRH-1","s":"001011101101110110001110011101111010111"},{"n":"Nivedhya P B","b":"DRH-1","s":"000000001000000000001010100000110011011"},{"n":"Nivedya J","b":"DRH-2","s":"001011111111110111111111111111111111111"},{"n":"Nivedya S Raj","b":"DRH-2","s":"000000001011110000101100100110101001000"},{"n":"Praghanya","b":"DRH-2","s":"001010010100100110011111111111101111111"},{"n":"Praneeth s","b":"DRH-2","s":"001011110101111111101111111110101011111"},{"n":"Remya Joshy","b":"DRH-2","s":"000000000100000001100110000000000011010"},{"n":"Rishikesh R","b":"DRH-1","s":"001010000100011111111111101001111011111"},{"n":"Savio Santhosh","b":"DRH-2","s":"000000000100100001000010000100001111010"},{"n":"Shereen Liaz","b":"DRH-1","s":"000000000100001110011111101011111011011"},{"n":"Shivani V Nath","b":"DRH-2","s":"001000000110100000010110001111000010110"},{"n":"Shivanith Vimal","b":"DRH-2","s":"001000010100110110001111000100011011010"},{"n":"Sia Sylvester","b":"DRH-1","s":"000000001000110110000011000110001010011"},{"n":"Sidhardh S","b":"DRH-1","s":"000000000000000000000000000000010000000"},{"n":"Sidhya Balaji","b":"DRH-2","s":"001011111111100111110111000110101111111"},{"n":"Sooraj Kiran S","b":"DRH-2","s":"000000000000100000000100000100000001000"},{"n":"Sreelakshmi S","b":"DRH-1","s":"001000000110100110010111001101011010110"},{"n":"Sreethu M","b":"DRH-2","s":"001111111011100110111011111111111110111"},{"n":"Surya Suresh","b":"DRH-2","s":"000000000110100000010100011101100000010"},{"n":"Swetalekshmy Sukumaran","b":"DRH-1","s":"001100000100000110010111001001001010111"},{"n":"Tanay KaiPully","b":"DRH-2","s":"001010001011110111111111111111011110111"},{"n":"Venkitesh M","b":"DRH-2","s":"000100000000101000000010000100000011010"},{"n":"Vinayak K G","b":"DRH-2","s":"000000000101100000010110001101001110010"},{"n":"Vismaya Shisi","b":"DRH-1","s":"000110001100110111101110010111111111011"},{"n":"Vrinda Biju","b":"DRH-1","s":"001010000111100110010011001111111011110"},{"n":"Yashaswini Awasthi","b":"DRH-1","s":"000100010100110100000110110110111111111"}]};
+const $ = id => document.getElementById(id);
+const hws = DATA.hws, students = DATA.students;
+const counted = hws.map((h,i)=>h.c?i:-1).filter(i=>i>=0), total = counted.length;
+students.forEach((s,i)=>{s.id=i;s.done=counted.filter(k=>s.s[k]==='1').length;s.pct=Math.round(s.done/total*100)});
+const avg = Math.round(students.reduce((a,s)=>a+s.done,0)/(students.length*total)*100);
+const esc = t=>String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+$('sub').textContent = total+' homeworks counted, up to '+hws.find(h=>h.c).d+'.';
+$('avg').textContent = avg+'%';
+function renderList(){
+  const q=$('q').value.trim().toLowerCase(), b=$('batch').value, so=$('sort').value;
+  const r=students.filter(s=>(!b||s.b===b)&&s.n.toLowerCase().includes(q));
+  r.sort((x,y)=>so==='high'?y.pct-x.pct||x.n.localeCompare(y.n):so==='low'?x.pct-y.pct||x.n.localeCompare(y.n):x.n.localeCompare(y.n));
+  $('list').innerHTML=r.length?r.map(s=>`<li><button class="st" data-id="${s.id}"><b>${esc(s.n)}<br><span class="muted" style="font-weight:400">${esc(s.b)} · ${s.done} of ${total}</span></b><span class="p">${s.pct}%</span></button></li>`).join(''):'<li class="muted" style="padding:20px 0">No student found.</li>';
+}
+let filter='all';
+function renderDetail(id){
+  const s=students[id];
+  const row=k=>{const h=hws[k],y=s.s[k]==='1';
+    return `<li class="hw" data-s="${h.c||y?(y?'y':'n'):'w'}"><span>${esc(h.n)}<br><span class="d">${esc(h.d)}</span></span>`+
+      (y?'<span class="tag y">✓ Submitted</span>':h.c?'<span class="tag n">✗ Not submitted</span>':'<span class="tag w">Not counted yet</span>')+'</li>';};
+  $('detail').innerHTML=`<button class="back" id="back">← All students</button><h2>${esc(s.n)}</h2><div class="muted">${esc(s.b)}</div>
+   <div class="sum"><div><b>${s.pct}%</b><span class="muted">Submitted</span></div><div><b>${s.done}/${total}</b><span class="muted">Homeworks</span></div><div><b>${avg}%</b><span class="muted">Class avg</span></div></div>
+   <div class="tabs"><button class="tab" data-f="all">All</button><button class="tab" data-f="y">Submitted (${s.done})</button><button class="tab" data-f="n">Not submitted (${total-s.done})</button></div>
+   <ul id="hwl">${hws.map((_,k)=>row(k)).join('')}</ul>`;
+  $('back').onclick=()=>{location.hash=''};
+  const apply=()=>{document.querySelectorAll('.tab').forEach(t=>t.setAttribute('aria-pressed',t.dataset.f===filter));
+    document.querySelectorAll('#hwl li').forEach(li=>li.hidden=!(filter==='all'||li.dataset.s===filter))};
+  document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>{filter=t.dataset.f;apply()});
+  apply();
+}
+function route(){
+  const m=/^#student-(\d+)$/.exec(location.hash), s=m&&students[+m[1]];
+  $('home').hidden=!!s;$('detail').hidden=!s;
+  if(s){filter='all';renderDetail(s.id);window.scrollTo(0,0)}else renderList();
+}
+$('list').addEventListener('click',e=>{const b=e.target.closest('.st');if(b)location.hash='student-'+b.dataset.id});
+['q','batch','sort'].forEach(i=>$(i).addEventListener('input',renderList));
+window.addEventListener('hashchange',route);route();
+</script>
+
+</body></html>
